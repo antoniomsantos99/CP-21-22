@@ -103,14 +103,31 @@ struct SmartArray genRandomArray(int size, int range)
     return array;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    // Valores por defeito
+    int nExecs = 10;
+    int arraySize = 1000000;
+    int nBuckets = 16;
+
+    if (argc > 1) // Number of executions
+        nExecs = atoi(argv[1]);
+    if (argc > 2) // Array Size
+        arraySize = atoi(argv[2]);
+    if (argc > 3) // nBuckets+Threads
+        nBuckets = atoi(argv[3]);
+
     printf("Hello World\n");
-    struct SmartArray t = genRandomArray(40000, 1000);
+    struct SmartArray t = genRandomArray(arraySize, arraySize);
+    struct SmartArray unordered;
+    int i;
+    for(i=0;i<nExecs;i++){
+        isSorted(&t);
+        bucketSortPar(nBuckets, &t);
+        isSorted(&t);
+    }
     //printArray(&t);
-    isSorted(&t);
-    bucketSortPar(32, &t);
-    isSorted(&t);
+
     //printArray(&t);
     freeSmartArray(&t);
 }
