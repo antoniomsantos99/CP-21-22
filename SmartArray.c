@@ -32,12 +32,13 @@ void addToArray (struct SmartArray *q, int elem){
         }
     q->array[q->tam] = elem;
     q->tam++;
-    //printf("%d | %d\n",q->tam,q->cap);
+    
 }
 
 //Print array
 void printArray(struct SmartArray *q){
-    for(int i = 0;i<q->tam;i++)
+    int i;
+    for(i = 0;i<q->tam;i++)
         printf("%d ",q->array[i]);
     printf("\n");
 }
@@ -58,7 +59,8 @@ void SarrayInsertionSort(struct SmartArray *q){
 }
 
 int isSorted(struct SmartArray *q){
-    for(int i=1;i<q->tam;i++){
+    int i;
+    for(i=1;i<q->tam;i++){
         if(q->array[i]<q->array[i-1]){
             printf("Array not ordenado\n");
             return 0;
@@ -70,8 +72,9 @@ int isSorted(struct SmartArray *q){
 
 //Tira o maior elemento do array
 int getMax(struct SmartArray *q){
+    int i;
     int max = q->array[0];
-    for(int i=1;i<q->tam;i++)
+    for(i=1;i<q->tam;i++)
         if(q->array[i]>max) max=q->array[i];
     return max;
 }
@@ -106,7 +109,8 @@ void countSort(int arr[], int n, int exp)
 void SarrayRadixSort(struct SmartArray *q)
 {
     int m = getMax(q);
+    int exp;
  
-    for (int exp = 1; m / exp > 0; exp *= 10)
+    for (exp = 1; m / exp > 0; exp *= 10)
         countSort(q->array, q->tam, exp);
 }

@@ -5,42 +5,51 @@
 
 void bucketSortPar(int nBuckets, struct SmartArray *unsorted)
 {
+
+    
     struct SmartArray buckets[nBuckets];
     int maxValue = getMax(unsorted);
     int interval = maxValue / nBuckets;
-    int bucketNo;
+    int bucketNo,i,j,n,m;
 
-    for (int i = 0; i < nBuckets; i++)
+    for (i = 0; i < nBuckets; i++)
         buckets[i] = *initSmartArray(1);
 
-    for (int i = 0; i < unsorted->tam; i++)
+    for (i = 0; i < unsorted->tam; i++)
     {
         bucketNo = (unsorted->array[i]) / interval;
-        if (bucketNo == nBuckets)
+        if (bucketNo >= nBuckets)
             bucketNo = nBuckets-1;
         addToArray(&buckets[bucketNo], (*unsorted).array[i]);
     }
-
-    for (int j = 0; j < nBuckets; j++)
+    
+    #pragma omp parallel num_threads(nBuckets)
     {
+    #pragma omp for
+    for (j = 0; j < nBuckets; j++)
+    {
+        int id = omp_get_thread_num();
+        printf("T%d:i%d\n", id, j);
         SarrayRadixSort(&buckets[j]);
     };
+    }
 
     int index = 0;
-    for (int n = 0; n < nBuckets; n++)
+    for (n = 0; n < nBuckets; n++)
     {
-        for (int m = 0; m < (&buckets[n])->tam; m++)
+        for (m = 0; m < (&buckets[n])->tam; m++)
         {
             unsorted->array[index] = (&buckets[n])->array[m];
             index++;
         }
     }
 
-    for (int j = 0; j < nBuckets; j++)
+    for (j = 0; j < nBuckets; j++)
     {
         freeSmartArray(&buckets[j]);
     };
 }
+
 
 
 
@@ -49,35 +58,36 @@ void bucketSortSeq(int nBuckets, struct SmartArray *unsorted)
     struct SmartArray buckets[nBuckets];
     int maxValue = getMax(unsorted);
     int interval = maxValue / nBuckets;
-    int bucketNo;
+    int bucketNo,i,j,n,m;
 
-    for (int i = 0; i < nBuckets; i++)
+    for (i = 0; i < nBuckets; i++)
         buckets[i] = *initSmartArray(1);
 
-    for (int i = 0; i < unsorted->tam; i++)
+    for (i = 0; i < unsorted->tam; i++)
     {
         bucketNo = (unsorted->array[i]) / interval;
-        if (bucketNo == nBuckets)
+        if (bucketNo >= nBuckets)
             bucketNo = nBuckets-1;
+       // printf("%d - %d | %d\n",bucketNo,buckets[bucketNo].tam,(buckets[bucketNo].cap));
         addToArray(&buckets[bucketNo], (*unsorted).array[i]);
     }
 
-    for (int j = 0; j < nBuckets; j++)
+    for (j = 0; j < nBuckets; j++)
     {
         SarrayRadixSort(&buckets[j]);
     };
 
     int index = 0;
-    for (int n = 0; n < nBuckets; n++)
+    for (n = 0; n < nBuckets; n++)
     {
-        for (int m = 0; m < (&buckets[n])->tam; m++)
+        for (m = 0; m < (&buckets[n])->tam; m++)
         {
             unsorted->array[index] = (&buckets[n])->array[m];
             index++;
         }
     }
 
-    for (int j = 0; j < nBuckets; j++)
+    for (j = 0; j < nBuckets; j++)
     {
         freeSmartArray(&buckets[j]);
     };
@@ -85,9 +95,10 @@ void bucketSortSeq(int nBuckets, struct SmartArray *unsorted)
 
 struct SmartArray genRandomArray(int size, int range)
 {
-    srand(2);
+    int i;
+    srand(2021);
     struct SmartArray array = *initSmartArray(size);
-    for (int i = 0; i < size; i++)
+    for (i = 0; i < size; i++)
         addToArray(&array, rand() % (range + 1));
     return array;
 }
@@ -95,11 +106,11 @@ struct SmartArray genRandomArray(int size, int range)
 int main()
 {
     printf("Hello World\n");
-    struct SmartArray t = genRandomArray(1000, 1000);
-    printArray(&t);
+    struct SmartArray t = genRandomArray(40000, 1000);
+    //printArray(&t);
     isSorted(&t);
-    bucketSort(5, &t);
+    bucketSortPar(32, &t);
     isSorted(&t);
-    printArray(&t);
+    //printArray(&t);
     freeSmartArray(&t);
 }
