@@ -18,4 +18,13 @@ void addToArray (struct SmartArray *q, int elem);
 
 void printArray(struct SmartArray *q);
 
+//Sorts the array with InsertionSort
+void SarrayInsertionSort(struct SmartArray *q);
+
+void SarrayRadixSort(struct SmartArray *q);
+
+int isSorted(struct SmartArray *q);
+
+int getMax(struct SmartArray *q);
+
 #endif
