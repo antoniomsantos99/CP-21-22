@@ -22,7 +22,6 @@ struct SmartArray* initSmartArray(int cap){
 //Função que dá free ao array
 void freeSmartArray(struct SmartArray *array){
    free(array->array);
-   free(array);
 }
 
 //Adiciona um elemento ao array
@@ -59,11 +58,12 @@ void SarrayInsertionSort(struct SmartArray *q){
 }
 
 int isSorted(struct SmartArray *q){
-    for(int i=1;i<q->tam;i++)
+    for(int i=1;i<q->tam;i++){
         if(q->array[i]<q->array[i-1]){
             printf("Array not ordenado\n");
             return 0;
         }
+    }
         printf("Array ordenado\n");
         return 1;
 }
