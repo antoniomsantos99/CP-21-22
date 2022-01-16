@@ -23,13 +23,13 @@ void bucketSortPar(int nBuckets, struct SmartArray *unsorted)
         addToArray(&buckets[bucketNo], (*unsorted).array[i]);
     }
     
-    #pragma omp parallel num_threads(nBuckets)
+    #pragma omp parallel  //num_threads(nBuckets)
     {
-    #pragma omp for
+    #pragma omp for schedule(dynamic)
     for (j = 0; j < nBuckets; j++)
     {
         int id = omp_get_thread_num();
-        printf("T%d:i%d\n", id, j);
+        //printf("T%d:i%d\n", id, j);
         SarrayRadixSort(&buckets[j]);
     };
     }
@@ -109,6 +109,7 @@ int main(int argc, char *argv[])
     int nExecs = 10;
     int arraySize = 1000000;
     int nBuckets = 16;
+    double parTime=0,seqTime=0;
 
     if (argc > 1) // Number of executions
         nExecs = atoi(argv[1]);
@@ -122,10 +123,28 @@ int main(int argc, char *argv[])
     struct SmartArray unordered;
     int i;
     for(i=0;i<nExecs;i++){
-        isSorted(&t);
-        bucketSortPar(nBuckets, &t);
-        isSorted(&t);
+        unordered=*dupSmartArray(&t);
+        //isSorted(&unordered);
+        double start = omp_get_wtime();
+        bucketSortPar(nBuckets, &unordered);
+        double end = omp_get_wtime();
+        //isSorted(&unordered);
+        parTime+=end-start;
+        freeSmartArray(&unordered);
     }
+
+    for(i=0;i<nExecs;i++){
+        unordered=*dupSmartArray(&t);
+        //isSorted(&unordered);
+        double start = omp_get_wtime();
+        bucketSortSeq(nBuckets, &unordered);
+        double end = omp_get_wtime();
+        //isSorted(&unordered);
+        seqTime+=end-start;
+        freeSmartArray(&unordered);
+    }
+    printf("Average Time to Sequential : %f ms\n",(seqTime*1000)/nExecs);
+    printf("Average Time to parallel : %f ms\n",(parTime*1000)/nExecs);
     //printArray(&t);
 
     //printArray(&t);

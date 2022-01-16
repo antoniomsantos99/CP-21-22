@@ -18,6 +18,8 @@ void addToArray (struct SmartArray *q, int elem);
 
 void printArray(struct SmartArray *q);
 
+struct SmartArray* dupSmartArray(struct SmartArray *array);
+
 //Sorts the array with InsertionSort
 void SarrayInsertionSort(struct SmartArray *q);
 

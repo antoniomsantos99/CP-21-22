@@ -19,11 +19,6 @@ struct SmartArray* initSmartArray(int cap){
     return q;
 };
 
-//Função que dá free ao array
-void freeSmartArray(struct SmartArray *array){
-   free(array->array);
-}
-
 //Adiciona um elemento ao array
 void addToArray (struct SmartArray *q, int elem){
     if(q->tam == q->cap){
@@ -31,8 +26,19 @@ void addToArray (struct SmartArray *q, int elem){
         q->cap = q->cap*2;
         }
     q->array[q->tam] = elem;
-    q->tam++;
-    
+    q->tam++;  
+}
+
+struct SmartArray* dupSmartArray(struct SmartArray *array){
+    int i;
+    struct SmartArray* q = initSmartArray(array->tam);
+    for(i=0;i<array->tam;i++) addToArray(q,array->array[i]);
+    return q;
+};
+
+//Função que dá free ao array
+void freeSmartArray(struct SmartArray *array){
+   free(array->array);
 }
 
 //Print array
