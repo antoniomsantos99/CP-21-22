@@ -4,8 +4,7 @@
 #include "SmartArray.h"
 
 #include "papi.h"
-
-void bucketSortPar(int nBuckets, struct SmartArray *unsorted)
+void bucketSortPar(int nBuckets, struct SmartArray *unsorted,int sortFlag)
 {
 
     
@@ -32,7 +31,20 @@ void bucketSortPar(int nBuckets, struct SmartArray *unsorted)
     {
         int id = omp_get_thread_num();
         //printf("T%d:i%d\n", id, j);
-        SarrayRadixSort(&buckets[j]);
+        switch (sortFlag){
+            case 0:
+                SarrayInsertionSort(&buckets[j]);
+                break;
+            case 1:
+                SarrayQuickSort(&buckets[j],0,(&buckets[j])->tam);
+                break;
+            default:
+                SarrayRadixSort(&buckets[j]);
+                break;
+        }
+        
+        
+        
     };
     }
 
@@ -55,7 +67,7 @@ void bucketSortPar(int nBuckets, struct SmartArray *unsorted)
 
 
 
-void bucketSortSeq(int nBuckets, struct SmartArray *unsorted)
+void bucketSortSeq(int nBuckets, struct SmartArray *unsorted,int sortFlag)
 {
     struct SmartArray buckets[nBuckets];
     int maxValue = getMax(unsorted);
@@ -76,7 +88,17 @@ void bucketSortSeq(int nBuckets, struct SmartArray *unsorted)
 
     for (j = 0; j < nBuckets; j++)
     {
-        SarrayRadixSort(&buckets[j]);
+        switch (sortFlag){
+            case 0:
+                SarrayInsertionSort(&buckets[j]);
+                break;
+            case 1:
+                SarrayQuickSort(&buckets[j],0,(&buckets[j])->tam);
+                break;
+            default:
+                SarrayRadixSort(&buckets[j]);
+                break;
+        }
     };
 
     int index = 0;
@@ -103,6 +125,39 @@ struct SmartArray genRandomArray(int size, int range)
     for (i = 0; i < size; i++)
         addToArray(&array, rand() % (range + 1));
     return array;
+}
+
+void testSortingAlg(int runs){
+    struct SmartArray array;
+    struct SmartArray unordered;
+    int elems=1000;
+    int buckets = 2;
+    int algo=0;
+    int p;
+    double time;
+    const char *algos[3];
+    algos[0] = "InsertionSort";
+    algos[1] = "QuickSort";
+    algos[2] = "RadixSort";
+
+    for(elems=1000;elems <= elems * 10000;elems=elems*10){
+        array = genRandomArray(elems,8192);
+        for(buckets=2;buckets <= 64;buckets=buckets*2)
+        for(algo=1;algo<=2;algo++){
+            time=0;
+            for(p=0;p<runs;p++){
+                unordered = *dupSmartArray(&array);
+                double start = omp_get_wtime();
+                bucketSortSeq(buckets,&unordered,algo);
+                double end = omp_get_wtime();
+                //isSorted(&unordered);
+                time+=end-start;
+                freeSmartArray(&unordered);
+        }
+            printf("Array size: %d | Nºbuckets: %d | Algorithm: %s | time: %lf ms\n",elems,buckets,algos[algo],(time*1000)/runs);
+    }
+    freeSmartArray(&array);
+}
 }
 
 
