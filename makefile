@@ -1,7 +1,7 @@
 TARGET = prog
-LIBS = -lm
+LIBS = -lm -lpapi -L/share/apps/papi/6.0.0/lib
 CC = gcc
-CFLAGS = -Wall -fopenmp -g
+CFLAGS = -Wall -fopenmp -g -I/share/apps/papi/6.0.0/include
 
 .PHONY: default all clean
 
